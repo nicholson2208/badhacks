@@ -8,6 +8,7 @@ Created on Sat Apr 29 15:33:20 2017
 import numpy as np
 import csv
 import pandas as pd
+import mlp
 
 def sigmoid(t):
     return 1/(1 + np.exp(-t))
@@ -52,7 +53,6 @@ def softmaxGrad(w, X, y):
     checkSize(w, X, y)
     return -np.matmul(X.T, np.multiply(sigmoid(-y*np.matmul(X, w)), y))
     
-#     return grad ### RETURN GRADIENt
 """
 Calculate accuracy using matrix operations!
 """
@@ -112,6 +112,36 @@ def oneVersusAll(Y, value): #done good to go!
     Yout=2*Y_bool - 1
     return Yout
 
+def splitIntoSets(X):
+    # Split into training, validation, and test sets
+    target = np.zeros((np.shape(X)[0],3));
+    indices = np.where(X[:,101]==0) 
+    target[indices,0] = 1
+    indices = np.where(X[:,101]==1)
+    target[indices,1] = 1
+    indices = np.where(X[:,101]==2)
+    target[indices,2] = 1
+    
+    # Randomly order the data
+    order = list(range(np.shape(X)[0]))
+    np.random.shuffle(order)
+    X = X[order,:]
+    target = target[order,:]
+    
+    train = X[::2,0:101] #make sure you don't include the label in the features
+    traint = target[::2]
+    valid = X[1::4,0:101]#make sure you don't include the label in the features
+    validt = target[1::4]
+    test = X[3::4,0:101]#make sure you don't include the label in the features
+    testt = target[3::4]
+    
+    return train, traint, valid, validt, test, testt
+
+def neuralNetwok():
+    # Train the network
+    net = mlp.mlp(train,traint,3,outtype='linear')
+    net.earlystopping(train,traint,valid,validt,0.1)
+    net.confmat(test,testt)
 
 def main():
     trainX, trainY = readData('This will be a path with training data')
@@ -128,7 +158,7 @@ def main():
     df.to_csv("weights.csv")
     print("Accuracy for training set is: ", accuracy(OVA, trainX, trainY))
     
-#    testX, testY = readData('MNIST_data/MNIST_test_data.csv')
+#    testX, testY = readData('test data will go here.csv')
 #    print("Accuracy for test set is: ", accuracy(OVA, testX, testY))
 
 main()
