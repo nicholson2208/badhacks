@@ -18,8 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from __future__ import print_function
-
 import myo as libmyo; libmyo.init()
 import time
 import sys
@@ -35,33 +33,30 @@ class Listener(libmyo.DeviceListener):
 
     def __init__(self):
         super(Listener, self).__init__()
-        self.orientation = None
         self.pose = libmyo.Pose.rest
         self.emg_enabled = False
         self.locked = False
         self.rssi = None
         self.emg = None
         self.last_time = 0
+        self.timestamp = 0
+        self.ax = 0
+        self.ay = 0
+        self.az = 0
+        self.gx = 0
+        self.gy = 0
+        self.gz = 0
+        self.ow = 0
+        self.ox = 0
+        self.oy = 0
+        self.oz = 0
 
     def output(self):
-        ctime = time.time()
-        if (ctime - self.last_time) < self.interval:
-            return
-        self.last_time = ctime
-
-        parts = []
-        if self.orientation:
-            for comp in self.orientation:
-                parts.append(str(comp).ljust(15))
-        parts.append(str(self.pose).ljust(10))
-        parts.append('E' if self.emg_enabled else ' ')
-        parts.append('L' if self.locked else ' ')
-        parts.append(self.rssi or 'NORSSI')
-        if self.emg:
-            for comp in self.emg:
-                parts.append(str(comp).ljust(5))
-        print('\r' + ''.join('[{0}]'.format(p) for p in parts), end='')
-        sys.stdout.flush()
+        print(str(self.timestamp) + "," +
+              str(self.ax)+"," + str(self.ay)+"," + str(self.az) +","+
+              str(self.gx)+"," + str(self.gy)+"," + str(self.gz) +","+
+              str(self.ox)+"," + str(self.oy)+"," + str(self.oz)+"," + str(self.ow)
+              )
 
     def on_connect(self, myo, timestamp, firmware_version):
         myo.vibrate('short')
@@ -74,37 +69,34 @@ class Listener(libmyo.DeviceListener):
         self.output()
 
     def on_pose(self, myo, timestamp, pose):
-        if pose == libmyo.Pose.double_tap:
-            myo.set_stream_emg(libmyo.StreamEmg.enabled)
-            self.emg_enabled = True
-        elif pose == libmyo.Pose.fingers_spread:
-            myo.set_stream_emg(libmyo.StreamEmg.disabled)
-            self.emg_enabled = False
-            self.emg = None
-        self.pose = pose
-        self.output()
+        pass
 
     def on_orientation_data(self, myo, timestamp, orientation):
-        self.orientation = orientation
-        self.output()
+        self.ox = orientation[0]
+        self.oy = orientation[1]
+        self.oz = orientation[2]
+        self.ow = orientation[3]
 
     def on_accelerometor_data(self, myo, timestamp, acceleration):
-        pass
+        self.ax = acceleration[0]
+        self.ay = acceleration[1]
+        self.az = acceleration[2]
+        self.timestamp = timestamp
+        self.output()
 
     def on_gyroscope_data(self, myo, timestamp, gyroscope):
-        pass
+        self.gx = gyroscope[0]
+        self.gy = gyroscope[1]
+        self.gz = gyroscope[2]
 
     def on_emg_data(self, myo, timestamp, emg):
-        self.emg = emg
-        self.output()
+        pass
 
     def on_unlock(self, myo, timestamp):
-        self.locked = False
-        self.output()
+        pass
 
     def on_lock(self, myo, timestamp):
-        self.locked = True
-        self.output()
+        pass
 
     def on_event(self, kind, event):
         """
@@ -156,7 +148,6 @@ class Listener(libmyo.DeviceListener):
 
 
 def main():
-    print("Connecting to Myo ... Use CTRL^C to exit.")
     try:
         hub = libmyo.Hub()
     except MemoryError:
