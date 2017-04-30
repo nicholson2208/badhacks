@@ -22,17 +22,19 @@ second_time=whole_thing["time"].iloc[1]
 end_time=whole_thing["time"].iloc[-1]
 
 #output=pd.DataFrame(np.zeros((25,9)),columns=["axmax","axmin","axvar","aymax","aymin","azvar", "azmax","azmin","azvar"])
-output=pd.DataFrame(np.zeros((25,9)),columns=["gxmax","gxmin","gxvar","gymax","gymin","gzvar", "gzmax","gzmin","gzvar"])
+output=pd.DataFrame(np.zeros((125,10)),columns=["gxmax","gxmin","gxvar","gymax","gymin","gzvar", "gzmax","gzmin","gzvar","label"])
 
+labels=pd.read_csv("label.csv")
 
-for i in range(25):
-    temp=whole_thing[["gx","gy","gz"]][i*750:750*i+500]
-    print(i)
-    for dim in ["gx","gy","gz"]:
-        output.loc[i][dim+"max"]=np.max(temp[dim])
-        output.loc[i][dim+"min"]=np.min(temp[dim])
-        
-        output.loc[i][dim+"var"]=np.var((temp[dim].astype("float")))
+for j in range(5):
+    for i in range(25):
+        temp=whole_thing[["gx","gy","gz"]][i*750:750*i+500]
+        print(i)
+        for dim in ["gx","gy","gz"]:
+            output.loc[i+25*(j)][dim+"max"]=np.max(temp[dim])*np.random.normal(loc=1,scale=0.02)
+            output.loc[i+25*(j)][dim+"min"]=np.min(temp[dim])*np.random.normal(loc=1,scale=0.02)
+            
+            output.loc[i+25*(j)][dim+"var"]=np.var((temp[dim].astype("float")))*np.random.normal(loc=1,scale=0.02)
 #    plt.plot(whole_thing["ax"][i*750:750*i+500])
-
+            output.loc[i+25*(j)]["label"]=labels["label"].iloc[i]
 output.to_csv("gfeature.csv")
