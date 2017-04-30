@@ -34,6 +34,7 @@ return Y in with shape [n,1] and starts from 0 instead of 1
 def readData(path):
     print("reading data from "+path)
     reader = csv.reader(open(path, "r"), delimiter=",")
+    next(reader,None)
     d = list(reader)
     
     # import data and reshape appropriately
@@ -144,7 +145,7 @@ def neuralNetwok():
     net.confmat(test,testt)
 
 def main():
-    trainX, trainY = readData('This will be a path with training data')
+    trainX, trainY = readData('gfeature.csv')
     # training individual classifier
     Nfeature = trainX.shape[1]
     Nclass = 2 #there are 2 different classes

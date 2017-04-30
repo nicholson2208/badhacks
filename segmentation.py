@@ -21,18 +21,18 @@ start_time=whole_thing["time"].iloc[0]
 second_time=whole_thing["time"].iloc[1]
 end_time=whole_thing["time"].iloc[-1]
 
-output=pd.DataFrame(np.zeros((25,9)),columns=["axmax","axmin","axvar","aymax","aymin","azvar", "azmax","azmin","azvar"])
-
+#output=pd.DataFrame(np.zeros((25,9)),columns=["axmax","axmin","axvar","aymax","aymin","azvar", "azmax","azmin","azvar"])
+output=pd.DataFrame(np.zeros((25,9)),columns=["gxmax","gxmin","gxvar","gymax","gymin","gzvar", "gzmax","gzmin","gzvar"])
 
 
 for i in range(25):
-    temp=whole_thing[["ax","ay","az"]][i*750:750*i+500]
+    temp=whole_thing[["gx","gy","gz"]][i*750:750*i+500]
     print(i)
-    for dim in ["ax","ay","az"]:
+    for dim in ["gx","gy","gz"]:
         output.loc[i][dim+"max"]=np.max(temp[dim])
         output.loc[i][dim+"min"]=np.min(temp[dim])
         
         output.loc[i][dim+"var"]=np.var((temp[dim].astype("float")))
 #    plt.plot(whole_thing["ax"][i*750:750*i+500])
 
-output.to_csv("feature.csv")
+output.to_csv("gfeature.csv")
