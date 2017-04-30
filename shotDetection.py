@@ -39,8 +39,8 @@ def readData(path):
     
     # import data and reshape appropriately
     data = np.array(d).astype("float")
-    X = data[:,0:-1] #I think there are 784 cols, with the last one being the label
-    y = data[:,-1]-1
+    X = data[:,:-1] #I think there are 784 cols, with the last one being the label
+    y = data[:,-1]
     y.shape = (len(y),1)
     
     # pad data with ones for more compact gradient computation
